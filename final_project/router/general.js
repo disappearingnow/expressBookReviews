@@ -20,12 +20,10 @@ public_users.post("/register", (req, res) => {
   }
 
   users.push({ username: username, password: password });
-  return res
-    .status(200)
-    .json({
-      message: `User ${username} has been registered successfully`,
-      users,
-    });
+  return res.status(200).json({
+    message: `User ${username} has been registered successfully`,
+    users,
+  });
 });
 
 // Get the book list available in the shop
@@ -89,7 +87,6 @@ public_users.get("/review/:isbn", function (req, res) {
   }
 
   return res.status(200).json({
-    title: books[isbn].title,
     reviews: books[isbn].reviews,
   });
 });

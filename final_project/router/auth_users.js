@@ -21,7 +21,7 @@ regd_users.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: "Username or password is missing" });
+    return res.status(400).json({ error: "Username or password is missing" });
   }
 
   if (authenticatedUser(username, password)) {
@@ -43,7 +43,7 @@ regd_users.post("/login", (req, res) => {
   } else {
     return res
       .status(400)
-      .json({ message: "Username and password do not match any records" });
+      .json({ error: "Username and password do not match any records" });
   }
 });
 
@@ -53,7 +53,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   if (!books[isbn]) {
     return res
       .status(400)
-      .json({ message: `Book with ISBN ${isbn} does not exist` });
+      .json({ error: `Book with ISBN ${isbn} does not exist` });
   }
 
   const { username } = req.session.authorization;
@@ -68,9 +68,40 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
   books[isbn].reviews[username] = review;
 
-  console.log(books[isbn].reviews);
+  return res
+    .status(200)
+    .json({ message: responseMsg, reviews: books[isbn].reviews });
+});
 
-  return res.status(200).json({ message: responseMsg, reviews: books[isbn].reviews });
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  const { isbn } = req.params;
+  if (!books[isbn]) {
+    return res
+      .status(400)
+      .json({ error: `Book with ISBN ${isbn} does not exist` });
+  }
+
+  const { username } = req.session.authorization;
+
+  const keys = Object.keys(books[isbn].reviews);
+  const doesReviewExist =
+    typeof keys.find((usernameKey) => usernameKey === username) !== "undefined";
+
+  if (!doesReviewExist) {
+    return res
+      .status(400)
+      .send({
+        error: `No review for the ${books[isbn].title} by user ${username} exists`,
+      });
+  }
+
+  delete books[isbn].reviews[username];
+
+  return res.status(200).json({
+    message: `Review for book ${books[isbn].title} by user ${username} has been deleted`,
+    reviews: books[isbn].reviews,
+  });
 });
 
 module.exports.authenticated = regd_users;

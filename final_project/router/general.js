@@ -11,23 +11,26 @@ public_users.post("/register", (req, res) => {
   if (!username || !password) {
     return res
       .status(404)
-      .json({ message: "Username and password are required" });
+      .json({ error: "Username and password are required" });
   }
 
   const isUsernameAvailable = isValid(username);
   if (!isUsernameAvailable) {
-    return res.status(404).json({ message: "Username is already taken" });
+    return res.status(404).json({ error: "Username is already taken" });
   }
 
   users.push({ username: username, password: password });
   return res
     .status(200)
-    .json({ message: `User ${username} has been registered successfully` });
+    .json({
+      message: `User ${username} has been registered successfully`,
+      users,
+    });
 });
 
 // Get the book list available in the shop
 public_users.get("/", function (req, res) {
-  return res.status(200).send(JSON.stringify(books));
+  return res.status(200).json({ allBooks: books });
 });
 
 // Get book details based on ISBN
@@ -35,10 +38,10 @@ public_users.get("/isbn/:isbn", function (req, res) {
   const { isbn } = req.params;
 
   if (!books[isbn]) {
-    return res.status(404).json({ message: "Invalid ISBN" });
+    return res.status(404).json({ error: `No book with ISBN ${isbn} found` });
   }
 
-  return res.status(200).send(JSON.stringify(books[isbn]));
+  return res.status(200).json({ searchResults: { ...books[isbn], isbn } });
 });
 
 // Get book details based on author
@@ -53,9 +56,9 @@ public_users.get("/author/:author", function (req, res) {
   if (bookList.length === 0) {
     return res
       .status(404)
-      .json({ message: `No books written by ${author} found` });
+      .json({ error: `No books written by ${author} found` });
   } else {
-    return res.status(200).send(JSON.stringify(bookList));
+    return res.status(200).json({ searchResults: bookList });
   }
 });
 
@@ -71,9 +74,9 @@ public_users.get("/title/:title", function (req, res) {
   if (bookList.length === 0) {
     return res
       .status(404)
-      .message({ message: `No books with the title "${title}" found` });
+      .message({ error: `No books with the title "${title}" found` });
   } else {
-    return res.status(200).send(JSON.stringify(bookList));
+    return res.status(200).json({ searchResults: bookList });
   }
 });
 
@@ -81,11 +84,14 @@ public_users.get("/title/:title", function (req, res) {
 public_users.get("/review/:isbn", function (req, res) {
   const { isbn } = req.params;
 
-  if (!books[isbn]) {
-    return res.status(404).json({ message: "Invalid ISBN" });
+  if (typeof books[isbn] === "undefined") {
+    return res.status(404).json({ error: "Invalid ISBN" });
   }
 
-  return res.status(200).send(JSON.stringify(books[isbn].reviews));
+  return res.status(200).json({
+    title: books[isbn].title,
+    reviews: books[isbn].reviews,
+  });
 });
 
 module.exports.general = public_users;

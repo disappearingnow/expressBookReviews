@@ -49,11 +49,26 @@ public_users.get("/", function (req, res) {
 public_users.get("/isbn/:isbn", function (req, res) {
   const { isbn } = req.params;
 
-  if (!books[isbn]) {
-    return res.status(404).json({ error: `No book with ISBN ${isbn} found` });
-  }
+  const getIsbnPromise = new Promise((resolve, reject) => {
+    try {
+      if (typeof books[isbn] === "undefined") {
+        reject(`No book with ISBN ${isbn} found`);
+      }
+      resolve(books[isbn]);
+    } catch (err) {
+      reject(err);
+    }
+  });
 
-  return res.status(200).json({ searchResults: { ...books[isbn], isbn } });
+  getIsbnPromise
+    .then((promiseResponse) => {
+      return res
+        .status(200)
+        .json({ searchResults: { ...promiseResponse, isbn } });
+    })
+    .catch((err) => {
+      return res.status(500).json({ error: err });
+    });
 });
 
 // Get book details based on author

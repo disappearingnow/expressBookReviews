@@ -37,7 +37,9 @@ regd_users.post("/login", (req, res) => {
       accessToken,
       username,
     };
-    return res.status(200).send(`User ${username} is now logged in`);
+    return res
+      .status(200)
+      .json({ message: `User ${username} is now logged in` });
   } else {
     return res
       .status(400)
@@ -48,13 +50,28 @@ regd_users.post("/login", (req, res) => {
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   const { isbn } = req.params;
+  if (!books[isbn]) {
+    return res
+      .status(400)
+      .json({ message: `Book with ISBN ${isbn} does not exist` });
+  }
+
   const { username } = req.session.authorization;
   const { review } = req.body;
 
-  res.status(200).send("ok");
-});
-//HERE
+  const keys = Object.keys(books[isbn].reviews);
+  const doesReviewExist =
+    typeof keys.find((usernameKey) => usernameKey === username) !== "undefined";
+  const responseMsg = `Review for book ${
+    books[isbn].title
+  } by user ${username} has been ${doesReviewExist ? "updated" : "added"}`;
 
+  books[isbn].reviews[username] = review;
+
+  console.log(books[isbn].reviews);
+
+  return res.status(200).json({ message: responseMsg, reviews: books[isbn].reviews });
+});
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;

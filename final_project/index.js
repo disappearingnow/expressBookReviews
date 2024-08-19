@@ -20,9 +20,8 @@ app.use(
 app.use("/customer/auth/*", function auth(req, res, next) {
   if (req.session.authorization) {
     token = req.session.authorization["accessToken"];
-    jwt.verify(token, "keepitasecret", (err, user) => {
+    jwt.verify(token, "access", (err, user) => {
       if (!err) {
-        //console.log("index.js line 25", user);
         req.user = user;
         next();
       } else {

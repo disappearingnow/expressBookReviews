@@ -14,9 +14,8 @@ public_users.post("/register", (req, res) => {
       .json({ message: "Username and password are required" });
   }
 
-  const isUsernameTaken =
-    users.filter((user) => user.username === username).length > 0;
-  if (isUsernameTaken) {
+  const isUsernameTaken = isValid(username);
+  if (!isUsernameTaken) {
     return res.status(404).json({ message: "Username is already taken" });
   }
 

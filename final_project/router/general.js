@@ -29,11 +29,13 @@ public_users.post("/register", (req, res) => {
 // Get the book list available in the shop
 public_users.get("/", function (req, res) {
   const getBooksPromise = new Promise((resolve, reject) => {
-    try {
-      resolve(books);
-    } catch (err) {
-      reject(err);
-    }
+    setTimeout(() => {
+      try {
+        resolve(books);
+      } catch (err) {
+        reject(err);
+      }
+    }, 2000);
   });
 
   getBooksPromise
@@ -50,14 +52,16 @@ public_users.get("/isbn/:isbn", function (req, res) {
   const { isbn } = req.params;
 
   const getIsbnPromise = new Promise((resolve, reject) => {
-    try {
-      if (typeof books[isbn] === "undefined") {
-        reject(`No book with ISBN ${isbn} found`);
+    setTimeout(() => {
+      try {
+        if (typeof books[isbn] === "undefined") {
+          reject(`No book with ISBN ${isbn} found`);
+        }
+        resolve(books[isbn]);
+      } catch (err) {
+        reject(err);
       }
-      resolve(books[isbn]);
-    } catch (err) {
-      reject(err);
-    }
+    }, 2000);
   });
 
   getIsbnPromise
@@ -74,20 +78,23 @@ public_users.get("/isbn/:isbn", function (req, res) {
 // Get book details based on author
 public_users.get("/author/:author", function (req, res) {
   const { author } = req.params;
-  const getByAuthorPromise = new Promise((resolve, reject) => {
-    try {
-      const bookList = [];
 
-      for (const i in books) {
-        if (books[i].author === author) bookList.push(books[i]);
+  const getByAuthorPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        const bookList = [];
+
+        for (const i in books) {
+          if (books[i].author === author) bookList.push(books[i]);
+        }
+        if (bookList.length === 0) {
+          reject(`No books written by ${author} found`);
+        }
+        resolve(bookList);
+      } catch (err) {
+        reject(err);
       }
-      if (bookList.length === 0) {
-        reject(`No books written by ${author} found`);
-      }
-      resolve(bookList);
-    } catch (err) {
-      reject(err);
-    }
+    }, 2000);
   });
 
   getByAuthorPromise
@@ -104,20 +111,22 @@ public_users.get("/title/:title", function (req, res) {
   const { title } = req.params;
 
   const getByTitlePromise = new Promise((resolve, reject) => {
-    try {
-      const bookList = [];
+    setTimeout(() => {
+      try {
+        const bookList = [];
 
-      for (const i in books) {
-        if (books[i].title === title) bookList.push(books[i]);
-      }
+        for (const i in books) {
+          if (books[i].title === title) bookList.push(books[i]);
+        }
 
-      if (bookList.length === 0) {
-        reject(`No books with the title '${title}' found`);
+        if (bookList.length === 0) {
+          reject(`No books with the title ${title} found`);
+        }
+        resolve(bookList);
+      } catch (err) {
+        reject(err);
       }
-      resolve(bookList);
-    } catch (err) {
-      reject(err);
-    }
+    },2000);
   });
 
   getByTitlePromise

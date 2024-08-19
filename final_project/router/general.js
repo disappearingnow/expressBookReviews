@@ -60,7 +60,14 @@ public_users.get("/title/:title", function (req, res) {
 
 //  Get book review
 public_users.get("/review/:isbn", function (req, res) {
+  const { isbn } = req.params;
 
+  if (!books[isbn]) {
+    res.send("Invalid ISBN");
+    return;
+  }
+
+  res.send(JSON.stringify(books[isbn].reviews));
 });
 
 module.exports.general = public_users;

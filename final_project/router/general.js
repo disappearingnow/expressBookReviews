@@ -99,10 +99,10 @@ public_users.get("/author/:author", function (req, res) {
 
   getByAuthorPromise
     .then((promiseResponse) => {
-      res.status(200).json({ searchResults: promiseResponse });
+      return res.status(200).json({ searchResults: promiseResponse });
     })
     .catch((err) => {
-      res.status(500).json({ error: err });
+      return res.status(500).json({ error: err });
     });
 });
 
@@ -126,7 +126,7 @@ public_users.get("/title/:title", function (req, res) {
       } catch (err) {
         reject(err);
       }
-    },2000);
+    }, 2000);
   });
 
   getByTitlePromise
@@ -134,7 +134,7 @@ public_users.get("/title/:title", function (req, res) {
       return res.status(200).json({ searchResults: promiseResponse });
     })
     .catch((err) => {
-      res.status(500).json({ error: err });
+      return res.status(500).json({ error: err });
     });
 });
 
